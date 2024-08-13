@@ -38,12 +38,12 @@ def mainPageLoop(username):
         if len(inventoryGroup) != 0:
             for i in range(len(inventoryGroup)):
                 print(str(i+1) + ': ' + inventoryTitle(inventoryGroup[i]))
-                numberOfInventories = i+1
+                numberOfInventories = i + 1
         else:
             print('Error: There are no inventories to display!')
         
-        #User Prompt
-        promptAnswer1 = input('Enter the number of the inventory you would like to access (1-' + str(numberOfInventories) + ') or (h) for help: ')
+        #User Prompt                                                                      #TODO if there are no inventories this is funky
+        promptAnswer1 = input(f'Enter the number of the inventory you would like to access (1-{str(numberOfInventories)}) or (h) for help: ')
 
         #To check if the user entererd the command to quit
         if promptAnswer1.isalpha():
@@ -82,7 +82,7 @@ def mainPageLoop(username):
 
             #To remove an inventory from the list
             elif promptAnswer1 == 'rm':
-                inventoryToRemove = input('Which inventory (1-' + str(numberOfInventories) + ') would you like to remove?: ')
+                inventoryToRemove = input(f'Which inventory (1-{str(numberOfInventories)}) would you like to remove?: ')
 
                 #Check that the input is a valid input
                 if inventoryToRemove.isdecimal():
@@ -90,9 +90,9 @@ def mainPageLoop(username):
                     inventoryToRemove = int(inventoryToRemove)
 
                     #If the response is a valid index
-                    if inventoryToRemove <= numberOfInventories:
+                    if inventoryToRemove <= numberOfInventories and inventoryToRemove != 0:
                         #Remove the inventory
-                        print('Are you sure you want to remove inventory ' + str(inventoryToRemove) + ' ?')
+                        print(f'Are you sure you want to remove {inventoryTitle(inventoryGroup[inventoryToRemove-1])}?')
                         pressEnter(.1)
                         del inventoryGroup[inventoryToRemove-1]
                         print('Done.')
@@ -148,7 +148,7 @@ def mainPageLoop(username):
             promptAnswer1 = int(promptAnswer1)
 
             #If the response is a valid index
-            if promptAnswer1 <= numberOfInventories:
+            if promptAnswer1 <= numberOfInventories and promptAnswer1 != 0:
                 #Enter the inventory page
                 inventoryPageLoop(inventoryGroup[promptAnswer1-1])
             else:
@@ -173,12 +173,12 @@ def inventoryPageLoop(inventory):
         newInventoryTitle = '_'.join(inventoryTitle(inventory).split())
 
         #Print everything to the screen
-        print('<:>>' + username + '/' + newInventoryTitle)
-        print(inventoryTitle(inventory).center(30, '='))
+        print('<:>>' + username + '/' + newInventoryTitle)        #To show the user where they are in the program
+        print((f' {inventoryTitle(inventory)} ').center(30, '=')) #To display the inventory title
         printInventory(inventory, 20, 8)
 
         #The user prompt
-        promptAnswer2 = input('What would you like to do? (H for help)')
+        promptAnswer2 = input('What would you like to do? (h for help)')
 
         #To check user commands
         if promptAnswer2.isalpha():
@@ -344,7 +344,7 @@ def printInventory(inventory, leftWidth, rightWidth):
 def createInventory(noWhiteName, name):
     #Create new dictionary/inventory with name
 
-    #Makes a dictionary and then turns it into one with the name of noWhiteName
+    #Makes a dictionary and then turns it into one with the name of noWhiteName, it is how it is because the inventory needs to be made in the global setting
     global x
     x = noWhiteName
     globals()[str(x)] = {'Title': str(name)}
@@ -372,7 +372,7 @@ def quit(secs):
     sys.exit()
 
 
-######MAIN PROGRAM STARTS BELOW######
+###### MAIN PROGRAM STARTS BELOW ######
 
 
 #Clear screen and begin
@@ -402,19 +402,17 @@ while userLoop:
 
         #If the username is in users ask for the password
         if username in users.keys():
-            #Get the password coralating to the username enter for comparison later
-            psk = users.get(username)
 
             #If password attempts are under a limit ask them to enter their password
             while passwordAttempts < allowedAttempts:
-                time.sleep(.5)
+                time.sleep(.4)
                 password = input('What is the password for, ' + username + '?: ')
 
-                #Keep going if password is correct
-                if password == psk:
-                    time.sleep(.5)
+                #Keep going if password is correct, get password here to not have the correct one stored before it is needed
+                if password == users.get(username):
+                    time.sleep(.4)
                     print('Password sucessful. Logging in...')
-                    time.sleep(.8)
+                    time.sleep(.7)
 
                     #Enter the main loop/database
                     mainPageLoop(username)
@@ -423,17 +421,19 @@ while userLoop:
 
                 #If the password is not correct
                 else:
-                    time.sleep(.5)
+                    time.sleep(.4)
                     print('Password is not correct.')
                     passwordAttempts += 1
                     print('Used Password Attempts: ' + str(passwordAttempts) + '/' + str(allowedAttempts))
+                print()
 
         #If username is not registered
         else:
-            time.sleep(.5)
+            time.sleep(.4)
             print('Username is not registerd.')
             userAttempts += 1
             print('Used Username Attempts: ' + str(userAttempts) + '/' + str(allowedAttempts))
+            print()
             continue
 
         break
